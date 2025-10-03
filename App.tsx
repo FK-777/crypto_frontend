@@ -4,16 +4,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Feather';
 import { WalletScreen } from './src/screens/WalletScreen';
 import { TradeBottomSheet } from './src/components/TradeBottomSheet';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import { ConvertScreen } from './src/screens/ConvertScreen';
+import { MarketScreen } from './src/screens/MarketScreen';
+import { ChooseCryptoScreen } from './src/screens/ChooseCryptoScreen';
+import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
 
 // Placeholder screens
-function MarketScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Market Screen</Text>
-    </View>
-  );
-}
+// function MarketScreen() {
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//       <Text>Market Screen</Text>
+//     </View>
+//   );
+// }
 
 function KripAiScreen() {
   return (
@@ -39,13 +43,26 @@ function TaxScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [showBuyScreen, setShowBuyScreen] = React.useState(false);
+  const [showSellScreen, setShowSellScreen] = React.useState(false);
+  const [showDepositScreen, setShowDepositScreen] = React.useState(false);
+
   const [tradeSheetVisible, setTradeSheetVisible] = React.useState(false);
 
   const handleTradeOptionPress = (optionId: string) => {
     console.log('Selected option:', optionId);
-    // Navigate to appropriate screen based on optionId
-    // You can add navigation logic here
+    if (optionId === 'buy') {
+      setShowBuyScreen(true);
+    } else if (optionId === 'sell') {
+      setShowSellScreen(true);
+    } else if (optionId === 'convert') {
+      setShowConvertScreen(true);
+    } else if (optionId === 'deposit') {
+      setShowDepositScreen(true);
+    }
   };
+
+  const [showConvertScreen, setShowConvertScreen] = React.useState(false);
 
   return (
     <>
@@ -112,6 +129,57 @@ export default function App() {
         onClose={() => setTradeSheetVisible(false)}
         onOptionPress={handleTradeOptionPress}
       />
+      <Modal
+        visible={showConvertScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ConvertScreen onClose={() => setShowConvertScreen(false)} />
+      </Modal>
+
+      <Modal
+        visible={showBuyScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCryptoScreen
+          title="Choose Crypto"
+          onClose={() => setShowBuyScreen(false)}
+          onSelectCrypto={crypto => {
+            console.log('Selected crypto for buy:', crypto);
+            // Navigate to Buy screen with selected crypto
+          }}
+        />
+      </Modal>
+
+      <Modal
+        visible={showSellScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCryptoScreen
+          title="Choose Crypto"
+          onClose={() => setShowSellScreen(false)}
+          onSelectCrypto={crypto => {
+            console.log('Selected crypto for sell:', crypto);
+            // Navigate to Sell screen with selected crypto
+          }}
+        />
+      </Modal>
+
+      <Modal
+        visible={showDepositScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCurrencyScreen
+          onClose={() => setShowDepositScreen(false)}
+          onSelectCurrency={currency => {
+            console.log('Selected currency for deposit:', currency);
+            // Navigate to Deposit screen with selected currency
+          }}
+        />
+      </Modal>
     </>
   );
 }

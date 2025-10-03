@@ -5,12 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { AssetItem } from '../components/AssetItem';
 import { AssetTrend } from '../components/AssetTrend';
 import { AssetAllocation } from '../components/AssetAllocation';
 import { PeriodSelector } from '../components/PeriodSelector';
+import { SearchAssetsScreen } from './SearchAssetsScreen';
 import { Asset, AllocationItem } from '../types';
 
 const assets: Asset[] = [
@@ -63,6 +65,7 @@ export const WalletScreen = () => {
   const [showAssetAllocation, setShowAssetAllocation] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [hideZeroBalance, setHideZeroBalance] = useState(false);
+  const [showSearchScreen, setShowSearchScreen] = useState(false);
 
   const periods = ['7D', '30D', '180D', '360D'];
 
@@ -71,74 +74,94 @@ export const WalletScreen = () => {
     : assets;
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Portfolio</Text>
-      </View>
-
-      <View style={styles.valueContainer}>
-        <View style={styles.labelContainer}>
-          <Text style={styles.label}>Est. Total Value</Text>
-          <Icon name="info" size={16} color="#999" style={styles.infoIcon} />
+    <>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Portfolio</Text>
         </View>
-        <Text style={styles.value}>Rs 85.53</Text>
-      </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.takeOutButton}>
-          <Text style={styles.takeOutButtonText}>Take Out</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.addFundsButton}>
-          <Text style={styles.addFundsButtonText}>Add Funds</Text>
-        </TouchableOpacity>
-      </View>
-
-      {showAssetAllocation ? (
-        <AssetAllocation
-          allocations={allocations}
-          onToggleView={() => setShowAssetAllocation(false)}
-        />
-      ) : (
-        <AssetTrend
-          data={chartData}
-          currentValue="Rs 92.28"
-          startValue="Rs 97.93"
-          onToggleView={() => setShowAssetAllocation(true)}
-        />
-      )}
-
-      <PeriodSelector
-        periods={periods}
-        selectedPeriod={selectedPeriod}
-        onSelectPeriod={setSelectedPeriod}
-      />
-
-      <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={styles.checkbox}
-          onPress={() => setHideZeroBalance(!hideZeroBalance)}
-        >
-          <View
-            style={[
-              styles.checkboxBox,
-              hideZeroBalance && styles.checkboxChecked,
-            ]}
-          >
-            {hideZeroBalance && <Icon name="check" size={14} color="#fff" />}
+        <View style={styles.valueContainer}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Est. Total Value</Text>
+            <Icon name="info" size={16} color="#999" style={styles.infoIcon} />
           </View>
-          <Text style={styles.checkboxLabel}>Hide 0 Balance</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.searchButton}>
-          <Icon name="search" size={20} color="#666" />
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.value}>Rs 85.53</Text>
+        </View>
 
-      <View style={styles.assetList}>
-        {filteredAssets.map(asset => (
-          <AssetItem key={asset.id} asset={asset} />
-        ))}
-      </View>
-    </ScrollView>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.takeOutButton}>
+            <Text style={styles.takeOutButtonText}>Take Out</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.addFundsButton}>
+            <Text style={styles.addFundsButtonText}>Add Funds</Text>
+          </TouchableOpacity>
+        </View>
+
+        {showAssetAllocation ? (
+          <AssetAllocation
+            allocations={allocations}
+            onToggleView={() => setShowAssetAllocation(false)}
+          />
+        ) : (
+          <AssetTrend
+            data={chartData}
+            currentValue="Rs 92.28"
+            startValue="Rs 97.93"
+            onToggleView={() => setShowAssetAllocation(true)}
+          />
+        )}
+
+        <PeriodSelector
+          periods={periods}
+          selectedPeriod={selectedPeriod}
+          onSelectPeriod={setSelectedPeriod}
+        />
+
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={styles.checkbox}
+            onPress={() => setHideZeroBalance(!hideZeroBalance)}
+          >
+            <View
+              style={[
+                styles.checkboxBox,
+                hideZeroBalance && styles.checkboxChecked,
+              ]}
+            >
+              {hideZeroBalance && <Icon name="check" size={14} color="#fff" />}
+            </View>
+            <Text style={styles.checkboxLabel}>Hide 0 Balance</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.searchButton}
+            onPress={() => setShowSearchScreen(true)}
+          >
+            <Icon name="search" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.assetList}>
+          {filteredAssets.map(asset => (
+            <AssetItem key={asset.id} asset={asset} />
+          ))}
+        </View>
+      </ScrollView>
+
+      <Modal
+        visible={showSearchScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <SearchAssetsScreen
+          assets={assets}
+          onClose={() => setShowSearchScreen(false)}
+          onSelectAsset={(asset: any) => {
+            console.log('Selected asset:', asset);
+            // Handle asset selection here
+          }}
+        />
+      </Modal>
+    </>
   );
 };
 
