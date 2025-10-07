@@ -7,6 +7,7 @@ import {
   FlatList,
   TouchableOpacity,
   SafeAreaView,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -22,7 +23,9 @@ interface Crypto {
 interface ChooseCryptoScreenProps {
   onClose: () => void;
   onSelectCrypto?: (crypto: Crypto) => void;
+  onBuyCrypto?: (crypto: Crypto, amount: number) => void;
   title?: string;
+  transactionType?: 'Buy' | 'Sell';
 }
 
 const topCryptos: Crypto[] = [
@@ -103,10 +106,14 @@ const topCryptos: Crypto[] = [
 export const ChooseCryptoScreen: React.FC<ChooseCryptoScreenProps> = ({
   onClose,
   onSelectCrypto,
+  onBuyCrypto,
   title = 'Choose Crypto',
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCryptos, setFilteredCryptos] = useState(topCryptos);
+  const [showAmountModal, setShowAmountModal] = useState(false);
+  const [selectedCrypto, setSelectedCrypto] = useState<Crypto | null>(null);
+  const [amount, setAmount] = useState('');
 
   useEffect(() => {
     if (searchQuery) {
@@ -121,13 +128,27 @@ export const ChooseCryptoScreen: React.FC<ChooseCryptoScreenProps> = ({
     }
   }, [searchQuery]);
 
+  const handleCryptoPress = (crypto: Crypto) => {
+    setSelectedCrypto(crypto);
+    setShowAmountModal(true);
+  };
+
+  const handleContinue = () => {
+    const amountValue = parseFloat(amount);
+    if (selectedCrypto && amountValue > 0) {
+      setShowAmountModal(false);
+      setAmount('');
+      if (onBuyCrypto) {
+        onBuyCrypto(selectedCrypto, amountValue);
+      }
+      onClose();
+    }
+  };
+
   const renderCryptoItem = ({ item }: { item: Crypto }) => (
     <TouchableOpacity
       style={styles.cryptoItem}
-      onPress={() => {
-        onSelectCrypto?.(item);
-        onClose();
-      }}
+      onPress={() => handleCryptoPress(item)}
     >
       <View style={styles.cryptoLeft}>
         <View style={[styles.cryptoIcon, { backgroundColor: item.color }]}>
@@ -180,6 +201,47 @@ export const ChooseCryptoScreen: React.FC<ChooseCryptoScreenProps> = ({
           </View>
         }
       />
+
+      {/* Amount Input Modal */}
+      <Modal
+        visible={showAmountModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowAmountModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Buy {selectedCrypto?.symbol}</Text>
+            <Text style={styles.modalHint}>Enter amount in USD</Text>
+            <TextInput
+              value={amount}
+              onChangeText={setAmount}
+              placeholder="e.g., 100"
+              keyboardType="numeric"
+              style={styles.modalInput}
+              placeholderTextColor="#999"
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnCancel]}
+                onPress={() => {
+                  setShowAmountModal(false);
+                  setAmount('');
+                }}
+              >
+                <Text style={styles.modalBtnTextCancel}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnContinue]}
+                onPress={handleContinue}
+                disabled={!amount || parseFloat(amount) <= 0}
+              >
+                <Text style={styles.modalBtnText}>Continue</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -288,5 +350,68 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#999',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCard: {
+    width: '85%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  modalHint: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 16,
+  },
+  modalInput: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    color: '#333',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBtnCancel: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  modalBtnContinue: {
+    backgroundColor: '#ff8c00',
+  },
+  modalBtnText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  modalBtnTextCancel: {
+    color: '#333',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });

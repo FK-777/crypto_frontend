@@ -4,11 +4,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Feather';
 import { WalletScreen } from './src/screens/WalletScreen';
 import { TradeBottomSheet } from './src/components/TradeBottomSheet';
-import { View, Text, TouchableOpacity, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  SafeAreaView,
+} from 'react-native';
 import { ConvertScreen } from './src/screens/ConvertScreen';
 import { MarketScreen } from './src/screens/MarketScreen';
 import { ChooseCryptoScreen } from './src/screens/ChooseCryptoScreen';
 import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
+import { KripAiScreen } from './src/screens/KripAiScreen';
+
+import { WebView } from 'react-native-webview';
 
 // Placeholder screens
 // function MarketScreen() {
@@ -19,13 +28,13 @@ import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
 //   );
 // }
 
-function KripAiScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>KRIP AI Screen</Text>
-    </View>
-  );
-}
+// function KripAiScreen() {
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//       <Text>KRIP AI Screen</Text>
+//     </View>
+//   );
+// }
 
 // Empty component since we use the bottom sheet
 function TradeScreen() {
@@ -43,23 +52,54 @@ function TaxScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const [tradeSheetVisible, setTradeSheetVisible] = React.useState(false);
   const [showBuyScreen, setShowBuyScreen] = React.useState(false);
   const [showSellScreen, setShowSellScreen] = React.useState(false);
   const [showDepositScreen, setShowDepositScreen] = React.useState(false);
-
-  const [tradeSheetVisible, setTradeSheetVisible] = React.useState(false);
+  const [showTransakWebView, setShowTransakWebView] = React.useState(false);
+  const [transakUrl, setTransakUrl] = React.useState('');
+  const [transactionType, setTransactionType] = React.useState<'BUY' | 'SELL'>(
+    'BUY',
+  );
 
   const handleTradeOptionPress = (optionId: string) => {
     console.log('Selected option:', optionId);
     if (optionId === 'buy') {
+      setTransactionType('BUY');
       setShowBuyScreen(true);
     } else if (optionId === 'sell') {
+      setTransactionType('SELL');
       setShowSellScreen(true);
     } else if (optionId === 'convert') {
       setShowConvertScreen(true);
     } else if (optionId === 'deposit') {
       setShowDepositScreen(true);
     }
+  };
+
+  const openTransakWebView = (
+    symbol: string,
+    amount: number,
+    type: 'BUY' | 'SELL',
+  ) => {
+    const apiKey = '8dd96a64-fedb-4153-98db-d168a878f23a';
+    const walletAddress = '0xf0c6Eb0f878f8c91C2711a10900d3B9D0CF8B221';
+
+    const network =
+      symbol === 'BTC' ? 'bitcoin' : symbol === 'SOL' ? 'solana' : 'ethereum';
+
+    const url =
+      `https://global-stg.transak.com?apiKey=${apiKey}` +
+      `&fiatAmount=${amount}` +
+      `&cryptoCurrencyCode=${symbol}` +
+      `&network=${network}` +
+      `&walletAddress=${walletAddress}` +
+      `&productsAvailed=${type}` +
+      `&hideExchangeScreen=true` +
+      `&disableWalletAddressForm=true`;
+
+    setTransakUrl(url);
+    setShowTransakWebView(true);
   };
 
   const [showConvertScreen, setShowConvertScreen] = React.useState(false);
@@ -145,9 +185,93 @@ export default function App() {
         <ChooseCryptoScreen
           title="Choose Crypto"
           onClose={() => setShowBuyScreen(false)}
+          onBuyCrypto={(crypto, amount) => {
+            console.log('Buy crypto:', crypto, 'Amount:', amount);
+            setShowBuyScreen(false);
+            openTransakWebView(crypto.symbol, amount, 'BUY');
+          }}
+          transactionType="Buy"
+        />
+      </Modal>
+
+      <Modal
+        visible={showSellScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCryptoScreen
+          title="Choose Crypto"
+          onClose={() => setShowSellScreen(false)}
+          onBuyCrypto={(crypto, amount) => {
+            console.log('Sell crypto:', crypto, 'Amount:', amount);
+            setShowSellScreen(false);
+            openTransakWebView(crypto.symbol, amount, 'SELL');
+          }}
+          transactionType="Sell"
+        />
+      </Modal>
+
+      <Modal
+        visible={showDepositScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCurrencyScreen
+          onClose={() => setShowDepositScreen(false)}
+          onSelectCurrency={currency => {
+            console.log('Selected currency for deposit:', currency);
+            setShowDepositScreen(false);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        visible={showTransakWebView}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+          <View
+            style={{
+              backgroundColor: '#ff8c00',
+              padding: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => setShowTransakWebView(false)}
+              style={{
+                position: 'absolute',
+                left: 16,
+                padding: 8,
+              }}
+            >
+              <Icon name="x" size={24} color="#fff" />
+            </TouchableOpacity>
+            <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>
+              {transactionType === 'BUY'
+                ? 'Buy Crypto To Your Wallet'
+                : 'Sell Crypto From Your Wallet'}
+            </Text>
+          </View>
+          {transakUrl ? (
+            <WebView source={{ uri: transakUrl }} style={{ flex: 1 }} />
+          ) : null}
+        </SafeAreaView>
+      </Modal>
+
+      <Modal
+        visible={showBuyScreen}
+        animationType="slide"
+        presentationStyle="fullScreen"
+      >
+        <ChooseCryptoScreen
+          title="Choose Crypto"
+          onClose={() => setShowBuyScreen(false)}
           onSelectCrypto={crypto => {
             console.log('Selected crypto for buy:', crypto);
-            // Navigate to Buy screen with selected crypto
           }}
         />
       </Modal>
@@ -162,7 +286,6 @@ export default function App() {
           onClose={() => setShowSellScreen(false)}
           onSelectCrypto={crypto => {
             console.log('Selected crypto for sell:', crypto);
-            // Navigate to Sell screen with selected crypto
           }}
         />
       </Modal>
@@ -176,7 +299,6 @@ export default function App() {
           onClose={() => setShowDepositScreen(false)}
           onSelectCurrency={currency => {
             console.log('Selected currency for deposit:', currency);
-            // Navigate to Deposit screen with selected currency
           }}
         />
       </Modal>
