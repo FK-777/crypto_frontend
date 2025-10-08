@@ -16,27 +16,8 @@ import { MarketScreen } from './src/screens/MarketScreen';
 import { ChooseCryptoScreen } from './src/screens/ChooseCryptoScreen';
 import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
 import { KripAiScreen } from './src/screens/KripAiScreen';
-
 import { WebView } from 'react-native-webview';
 
-// Placeholder screens
-// function MarketScreen() {
-//   return (
-//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-//       <Text>Market Screen</Text>
-//     </View>
-//   );
-// }
-
-// function KripAiScreen() {
-//   return (
-//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-//       <Text>KRIP AI Screen</Text>
-//     </View>
-//   );
-// }
-
-// Empty component since we use the bottom sheet
 function TradeScreen() {
   return null;
 }
@@ -56,6 +37,7 @@ export default function App() {
   const [showBuyScreen, setShowBuyScreen] = React.useState(false);
   const [showSellScreen, setShowSellScreen] = React.useState(false);
   const [showDepositScreen, setShowDepositScreen] = React.useState(false);
+  const [showConvertScreen, setShowConvertScreen] = React.useState(false);
   const [showTransakWebView, setShowTransakWebView] = React.useState(false);
   const [transakUrl, setTransakUrl] = React.useState('');
   const [transactionType, setTransactionType] = React.useState<'BUY' | 'SELL'>(
@@ -64,16 +46,18 @@ export default function App() {
 
   const handleTradeOptionPress = (optionId: string) => {
     console.log('Selected option:', optionId);
+    setTradeSheetVisible(false);
+
     if (optionId === 'buy') {
       setTransactionType('BUY');
-      setShowBuyScreen(true);
+      setTimeout(() => setShowBuyScreen(true), 300);
     } else if (optionId === 'sell') {
       setTransactionType('SELL');
-      setShowSellScreen(true);
+      setTimeout(() => setShowSellScreen(true), 300);
     } else if (optionId === 'convert') {
-      setShowConvertScreen(true);
+      setTimeout(() => setShowConvertScreen(true), 300);
     } else if (optionId === 'deposit') {
-      setShowDepositScreen(true);
+      setTimeout(() => setShowDepositScreen(true), 300);
     }
   };
 
@@ -98,11 +82,19 @@ export default function App() {
       `&hideExchangeScreen=true` +
       `&disableWalletAddressForm=true`;
 
+    console.log('Opening Transak with URL:', url);
     setTransakUrl(url);
-    setShowTransakWebView(true);
-  };
 
-  const [showConvertScreen, setShowConvertScreen] = React.useState(false);
+    setShowBuyScreen(false);
+    setShowSellScreen(false);
+
+    setTimeout(() => {
+      setShowTransakWebView(true);
+      console.log('OPENED >>> ???');
+      console.log('Sheeda kenda ani paa de...');
+      console.log('Mai keya lo gee ani pyy gyi...');
+    }, 400);
+  };
 
   return (
     <>
@@ -169,6 +161,7 @@ export default function App() {
         onClose={() => setTradeSheetVisible(false)}
         onOptionPress={handleTradeOptionPress}
       />
+
       <Modal
         visible={showConvertScreen}
         animationType="slide"
@@ -186,8 +179,7 @@ export default function App() {
           title="Choose Crypto"
           onClose={() => setShowBuyScreen(false)}
           onBuyCrypto={(crypto, amount) => {
-            console.log('Buy crypto:', crypto, 'Amount:', amount);
-            setShowBuyScreen(false);
+            console.log('Buy crypto:', crypto.symbol, 'Amount:', amount);
             openTransakWebView(crypto.symbol, amount, 'BUY');
           }}
           transactionType="Buy"
@@ -203,8 +195,7 @@ export default function App() {
           title="Choose Crypto"
           onClose={() => setShowSellScreen(false)}
           onBuyCrypto={(crypto, amount) => {
-            console.log('Sell crypto:', crypto, 'Amount:', amount);
-            setShowSellScreen(false);
+            console.log('Sell crypto:', crypto.symbol, 'Amount:', amount);
             openTransakWebView(crypto.symbol, amount, 'SELL');
           }}
           transactionType="Sell"
@@ -229,6 +220,7 @@ export default function App() {
         visible={showTransakWebView}
         animationType="slide"
         presentationStyle="fullScreen"
+        onRequestClose={() => setShowTransakWebView(false)}
       >
         <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
           <View
@@ -241,7 +233,10 @@ export default function App() {
             }}
           >
             <TouchableOpacity
-              onPress={() => setShowTransakWebView(false)}
+              onPress={() => {
+                console.log('Closing Transak');
+                setShowTransakWebView(false);
+              }}
               style={{
                 position: 'absolute',
                 left: 16,
@@ -257,50 +252,43 @@ export default function App() {
             </Text>
           </View>
           {transakUrl ? (
-            <WebView source={{ uri: transakUrl }} style={{ flex: 1 }} />
-          ) : null}
+            <WebView
+              source={{ uri: transakUrl }}
+              style={{ flex: 1 }}
+              startInLoadingState={true}
+              renderLoading={() => (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: '#000',
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontSize: 16 }}>
+                    Loading Transak...
+                  </Text>
+                </View>
+              )}
+              onError={syntheticEvent => {
+                const { nativeEvent } = syntheticEvent;
+                console.warn('WebView error: ', nativeEvent);
+              }}
+              onLoad={() => console.log('WebView loaded successfully')}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#000',
+              }}
+            >
+              <Text style={{ color: '#fff' }}>No URL set</Text>
+            </View>
+          )}
         </SafeAreaView>
-      </Modal>
-
-      <Modal
-        visible={showBuyScreen}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <ChooseCryptoScreen
-          title="Choose Crypto"
-          onClose={() => setShowBuyScreen(false)}
-          onSelectCrypto={crypto => {
-            console.log('Selected crypto for buy:', crypto);
-          }}
-        />
-      </Modal>
-
-      <Modal
-        visible={showSellScreen}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <ChooseCryptoScreen
-          title="Choose Crypto"
-          onClose={() => setShowSellScreen(false)}
-          onSelectCrypto={crypto => {
-            console.log('Selected crypto for sell:', crypto);
-          }}
-        />
-      </Modal>
-
-      <Modal
-        visible={showDepositScreen}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <ChooseCurrencyScreen
-          onClose={() => setShowDepositScreen(false)}
-          onSelectCurrency={currency => {
-            console.log('Selected currency for deposit:', currency);
-          }}
-        />
       </Modal>
     </>
   );
