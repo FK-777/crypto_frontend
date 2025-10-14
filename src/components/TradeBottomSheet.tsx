@@ -27,13 +27,13 @@ const tradeOptions: TradeOption[] = [
   {
     id: 'buy',
     title: 'Buy',
-    subtitle: 'Buy crypto with PKR',
+    subtitle: 'Buy crypto with USDT',
     icon: 'calendar',
   },
   {
     id: 'sell',
     title: 'Sell',
-    subtitle: 'Sell crypto to PKR',
+    subtitle: 'Sell crypto to USDT',
     icon: 'calendar',
   },
   {
@@ -41,12 +41,6 @@ const tradeOptions: TradeOption[] = [
     title: 'Convert',
     subtitle: 'Trade with Convert instantly',
     icon: 'refresh-cw',
-  },
-  {
-    id: 'deposit',
-    title: 'Deposit',
-    subtitle: 'Deposit crypto on-chain or local currencies',
-    icon: 'download',
   },
 ];
 

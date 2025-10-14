@@ -16,8 +16,10 @@ import { MarketScreen } from './src/screens/MarketScreen';
 import { ChooseCryptoScreen } from './src/screens/ChooseCryptoScreen';
 import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
 import { KripAiScreen } from './src/screens/KripAiScreen';
+import { AuthNavigator } from './src/navigation/AuthNavigator';
 import { WebView } from 'react-native-webview';
 
+// Empty component since we use the bottom sheet
 function TradeScreen() {
   return null;
 }
@@ -33,6 +35,10 @@ function TaxScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+
+  // Trade and modal states
   const [tradeSheetVisible, setTradeSheetVisible] = React.useState(false);
   const [showBuyScreen, setShowBuyScreen] = React.useState(false);
   const [showSellScreen, setShowSellScreen] = React.useState(false);
@@ -56,8 +62,6 @@ export default function App() {
       setTimeout(() => setShowSellScreen(true), 300);
     } else if (optionId === 'convert') {
       setTimeout(() => setShowConvertScreen(true), 300);
-    } else if (optionId === 'deposit') {
-      setTimeout(() => setShowDepositScreen(true), 300);
     }
   };
 
@@ -84,18 +88,21 @@ export default function App() {
 
     console.log('Opening Transak with URL:', url);
     setTransakUrl(url);
-
     setShowBuyScreen(false);
     setShowSellScreen(false);
 
     setTimeout(() => {
       setShowTransakWebView(true);
-      console.log('OPENED >>> ???');
-      console.log('Sheeda kenda ani paa de...');
-      console.log('Mai keya lo gee ani pyy gyi...');
+      console.log('Transak WebView opened');
     }, 400);
   };
 
+  // Show auth screens if not authenticated
+  if (!isAuthenticated) {
+    return <AuthNavigator onAuthSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  // Show main app if authenticated
   return (
     <>
       <NavigationContainer>
@@ -266,7 +273,7 @@ export default function App() {
                   }}
                 >
                   <Text style={{ color: '#fff', fontSize: 16 }}>
-                    Loading Transak...
+                    Loading...
                   </Text>
                 </View>
               )}
@@ -274,7 +281,7 @@ export default function App() {
                 const { nativeEvent } = syntheticEvent;
                 console.warn('WebView error: ', nativeEvent);
               }}
-              onLoad={() => console.log('WebView loaded successfully')}
+              onLoad={() => console.log('WebView loaded')}
             />
           ) : (
             <View
