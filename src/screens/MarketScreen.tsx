@@ -3,9 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   FlatList,
+  TextInput,
+  SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
@@ -22,57 +23,66 @@ interface CryptoAsset {
 const cryptoData: CryptoAsset[] = [
   {
     id: '1',
-    name: 'Ethereum',
-    symbol: 'ETH',
-    icon: '💎',
-    color: '#627EEA',
-    price: 1126053.25,
-    change24h: 1.65,
-  },
-  {
-    id: '2',
-    name: 'Plasma',
-    symbol: 'XPL',
-    icon: '🔵',
-    color: '#00B8D4',
-    price: 420.99,
-    change24h: 22.43,
-  },
-  {
-    id: '3',
-    name: 'Solana',
-    symbol: 'SOL',
-    icon: '⚫',
-    color: '#14F195',
-    price: 56000.0,
-    change24h: -3.21,
-  },
-  {
-    id: '4',
-    name: 'BNB',
-    symbol: 'BNB',
-    icon: '🔶',
-    color: '#F3BA2F',
-    price: 275834.88,
-    change24h: 3.83,
-  },
-  {
-    id: '5',
-    name: 'Kaito',
-    symbol: 'KAITO',
-    icon: '⭐',
-    color: '#00D4AA',
-    price: 319.57,
-    change24h: 13.4,
-  },
-  {
-    id: '6',
     name: 'Bitcoin',
     symbol: 'BTC',
     icon: '₿',
     color: '#F7931A',
-    price: 30737279.2,
+    price: 62000.0,
+    change24h: 0.5,
+  },
+  {
+    id: '2',
+    name: 'Ethereum',
+    symbol: 'ETH',
+    icon: 'Ξ',
+    color: '#627EEA',
+    price: 45000.0,
+    change24h: 0.2,
+  },
+  {
+    id: '3',
+    name: 'Shiba Inu',
+    symbol: 'SHIB',
+    icon: '🐕',
+    color: '#FFA409',
+    price: 0.0184,
     change24h: -0.2,
+  },
+  {
+    id: '4',
+    name: 'Cortex',
+    symbol: 'CXTX',
+    icon: '△',
+    color: '#000',
+    price: 0.1593,
+    change24h: -0.4,
+  },
+  {
+    id: '5',
+    name: 'Binance Coin',
+    symbol: 'BNB',
+    icon: '◆',
+    color: '#F3BA2F',
+    price: 318.0,
+    change24h: -0.2,
+  },
+  {
+    id: '6',
+    name: 'Flux',
+    symbol: 'FLUX',
+    icon: '⬢',
+    color: '#2B6DE6',
+    price: 0.664,
+    change24h: 0.15,
+  },
+  {
+    id: '7',
+    name: 'Flow',
+    symbol: 'FLOW',
+    icon: '◉',
+    color: '#00EF8B',
+    price: 0.6988,
+    change24h: 1.2,
   },
 ];
 
@@ -81,6 +91,7 @@ export const MarketScreen = () => {
   const [activeSortTab, setActiveSortTab] = useState<
     'hot' | 'marketCap' | 'price' | '24hChange'
   >('hot');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const renderCryptoItem = ({ item }: { item: CryptoAsset }) => (
     <TouchableOpacity style={styles.cryptoItem}>
@@ -89,11 +100,12 @@ export const MarketScreen = () => {
           <Text style={styles.cryptoIconText}>{item.icon}</Text>
         </View>
         <View style={styles.cryptoInfo}>
-          <Text style={styles.cryptoName}>{item.name}</Text>
           <Text style={styles.cryptoSymbol}>{item.symbol}</Text>
+          <Text style={styles.cryptoName}>{item.name}</Text>
         </View>
       </View>
       <View style={styles.cryptoRight}>
+        <Text style={styles.cryptoPrice}>${item.price.toLocaleString()}</Text>
         <Text
           style={[
             styles.changePercent,
@@ -101,238 +113,186 @@ export const MarketScreen = () => {
           ]}
         >
           {item.change24h >= 0 ? '+' : ''}
-          {item.change24h.toFixed(2)}%
+          {item.change24h.toFixed(1)}%
         </Text>
-        <Text style={styles.cryptoPrice}>Rs {item.price.toLocaleString()}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
         <Text style={styles.title}>Market</Text>
-      </View>
 
-      <View style={styles.valueContainer}>
-        <View style={styles.labelContainer}>
-          <Text style={styles.label}>Est. Total Value</Text>
-          <Icon name="info" size={16} color="#999" style={styles.infoIcon} />
+        <View style={styles.searchContainer}>
+          <Icon
+            name="search"
+            size={20}
+            color="#999"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search Token"
+            placeholderTextColor="#999"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <TouchableOpacity style={styles.filterButton}>
+            <Icon name="sliders" size={20} color="#333" />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.value}>Rs 85.53</Text>
-      </View>
 
-      <TouchableOpacity style={styles.addFundsButton}>
-        <Text style={styles.addFundsButtonText}>Add Funds</Text>
-      </TouchableOpacity>
-
-      <View style={styles.promoCard}>
-        <View style={styles.promoContent}>
-          <Text style={styles.promoTitle}>EARN TOGATHER</Text>
-          <Text style={styles.promoSubtitle}>Share $450,000 Prize Pool !</Text>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'watchlist' && styles.activeTab]}
+            onPress={() => setActiveTab('watchlist')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'watchlist' && styles.activeTabText,
+              ]}
+            >
+              Watchlist
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'coin' && styles.activeTab]}
+            onPress={() => setActiveTab('coin')}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === 'coin' && styles.activeTabText,
+              ]}
+            >
+              Coin
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.promoIcon}>
-          <Icon name="arrow-up-right" size={24} color="#ff8c00" />
+
+        <View style={styles.sortContainer}>
+          <TouchableOpacity
+            style={[
+              styles.sortTab,
+              activeSortTab === 'hot' && styles.activeSortTab,
+            ]}
+            onPress={() => setActiveSortTab('hot')}
+          >
+            <Text
+              style={[
+                styles.sortTabText,
+                activeSortTab === 'hot' && styles.activeSortTabText,
+              ]}
+            >
+              Hot
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sortTab,
+              activeSortTab === 'marketCap' && styles.activeSortTab,
+            ]}
+            onPress={() => setActiveSortTab('marketCap')}
+          >
+            <Text
+              style={[
+                styles.sortTabText,
+                activeSortTab === 'marketCap' && styles.activeSortTabText,
+              ]}
+            >
+              Market Cap
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sortTab,
+              activeSortTab === 'price' && styles.activeSortTab,
+            ]}
+            onPress={() => setActiveSortTab('price')}
+          >
+            <Text
+              style={[
+                styles.sortTabText,
+                activeSortTab === 'price' && styles.activeSortTabText,
+              ]}
+            >
+              Price
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.sortTab,
+              activeSortTab === '24hChange' && styles.activeSortTab,
+            ]}
+            onPress={() => setActiveSortTab('24hChange')}
+          >
+            <Text
+              style={[
+                styles.sortTabText,
+                activeSortTab === '24hChange' && styles.activeSortTabText,
+              ]}
+            >
+              24H Change
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
 
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'watchlist' && styles.activeTab]}
-          onPress={() => setActiveTab('watchlist')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'watchlist' && styles.activeTabText,
-            ]}
-          >
-            Watchlist
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'coin' && styles.activeTab]}
-          onPress={() => setActiveTab('coin')}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === 'coin' && styles.activeTabText,
-            ]}
-          >
-            Coin
-          </Text>
-        </TouchableOpacity>
+        <FlatList
+          data={cryptoData}
+          renderItem={renderCryptoItem}
+          keyExtractor={item => item.id}
+          style={styles.list}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
-
-      <View style={styles.sortContainer}>
-        <TouchableOpacity
-          style={[
-            styles.sortTab,
-            activeSortTab === 'hot' && styles.activeSortTab,
-          ]}
-          onPress={() => setActiveSortTab('hot')}
-        >
-          <Text
-            style={[
-              styles.sortTabText,
-              activeSortTab === 'hot' && styles.activeSortTabText,
-            ]}
-          >
-            Hot
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.sortTab,
-            activeSortTab === 'marketCap' && styles.activeSortTab,
-          ]}
-          onPress={() => setActiveSortTab('marketCap')}
-        >
-          <Text
-            style={[
-              styles.sortTabText,
-              activeSortTab === 'marketCap' && styles.activeSortTabText,
-            ]}
-          >
-            Market Cap
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.sortTab,
-            activeSortTab === 'price' && styles.activeSortTab,
-          ]}
-          onPress={() => setActiveSortTab('price')}
-        >
-          <Text
-            style={[
-              styles.sortTabText,
-              activeSortTab === 'price' && styles.activeSortTabText,
-            ]}
-          >
-            Price
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.sortTab,
-            activeSortTab === '24hChange' && styles.activeSortTab,
-          ]}
-          onPress={() => setActiveSortTab('24hChange')}
-        >
-          <Text
-            style={[
-              styles.sortTabText,
-              activeSortTab === '24hChange' && styles.activeSortTabText,
-            ]}
-          >
-            24H Change
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <FlatList
-        data={cryptoData}
-        renderItem={renderCryptoItem}
-        keyExtractor={item => item.id}
-        style={styles.list}
-      />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    padding: 16,
-    paddingTop: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 20,
     fontWeight: '600',
     textAlign: 'center',
     color: '#333',
+    paddingVertical: 16,
   },
-  valueContainer: {
-    padding: 16,
-    paddingBottom: 8,
-  },
-  labelContainer: {
+  searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
-  },
-  label: {
-    fontSize: 14,
-    color: '#666',
-  },
-  infoIcon: {
-    marginLeft: 4,
-  },
-  value: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  addFundsButton: {
-    backgroundColor: '#ff8c00',
+    backgroundColor: '#f8f8f8',
     marginHorizontal: 16,
-    padding: 16,
-    borderRadius: 24,
-    alignItems: 'center',
     marginBottom: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
   },
-  addFundsButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  searchIcon: {
+    marginRight: 8,
   },
-  promoCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFF8E1',
-    marginHorizontal: 16,
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#FFD54F',
-    marginBottom: 16,
-  },
-  promoContent: {
+  searchInput: {
     flex: 1,
-  },
-  promoTitle: {
-    fontSize: 12,
-    color: '#F57C00',
-    marginBottom: 4,
-    fontWeight: '600',
-  },
-  promoSubtitle: {
     fontSize: 16,
-    fontWeight: '600',
     color: '#333',
+    padding: 0,
   },
-  promoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#ff8c00',
+  filterButton: {
+    padding: 4,
   },
   tabContainer: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    marginBottom: 16,
+    marginBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -368,7 +328,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   sortTabText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#999',
   },
   activeSortTabText: {
@@ -393,39 +353,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cryptoIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   cryptoIconText: {
-    fontSize: 20,
+    fontSize: 24,
+    color: '#fff',
   },
   cryptoInfo: {
     justifyContent: 'center',
   },
-  cryptoName: {
+  cryptoSymbol: {
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
     marginBottom: 2,
   },
-  cryptoSymbol: {
-    fontSize: 14,
+  cryptoName: {
+    fontSize: 13,
     color: '#999',
   },
   cryptoRight: {
     alignItems: 'flex-end',
   },
-  changePercent: {
+  cryptoPrice: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#333',
     marginBottom: 2,
   },
-  cryptoPrice: {
-    fontSize: 14,
-    color: '#999',
+  changePercent: {
+    fontSize: 13,
+    fontWeight: '500',
   },
 });
