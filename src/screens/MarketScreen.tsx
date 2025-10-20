@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { Platform, StatusBar } from 'react-native';
 
 interface CryptoAsset {
   id: string;
@@ -52,7 +53,7 @@ const cryptoData: CryptoAsset[] = [
     id: '4',
     name: 'Cortex',
     symbol: 'CXTX',
-    icon: '△',
+    icon: '▲',
     color: '#000',
     price: 0.1593,
     change24h: -0.4,
@@ -86,7 +87,11 @@ const cryptoData: CryptoAsset[] = [
   },
 ];
 
-export const MarketScreen = () => {
+interface MarketScreenProps {
+  navigation: any;
+}
+
+export const MarketScreen: React.FC<MarketScreenProps> = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState<'watchlist' | 'coin'>('watchlist');
   const [activeSortTab, setActiveSortTab] = useState<
     'hot' | 'marketCap' | 'price' | '24hChange'
@@ -94,7 +99,19 @@ export const MarketScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const renderCryptoItem = ({ item }: { item: CryptoAsset }) => (
-    <TouchableOpacity style={styles.cryptoItem}>
+    <TouchableOpacity
+      style={styles.cryptoItem}
+      onPress={() => {
+        navigation.navigate('MarketDetail', {
+          symbol: item.symbol,
+          name: item.name,
+          icon: item.icon,
+          color: item.color,
+          price: item.price,
+          change24h: item.change24h,
+        });
+      }}
+    >
       <View style={styles.cryptoLeft}>
         <View style={[styles.cryptoIcon, { backgroundColor: item.color }]}>
           <Text style={styles.cryptoIconText}>{item.icon}</Text>
@@ -255,6 +272,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,
