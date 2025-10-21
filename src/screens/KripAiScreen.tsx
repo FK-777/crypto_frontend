@@ -25,9 +25,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { KripAiStackParamList } from '../navigation/KripAIStackNavigator';
 import { useNavigation } from '@react-navigation/native';
 
-/* =========================================
-   Bot Avatar Icon
-========================================= */
 const BotAvatar = () => (
   <View style={styles.botAvatarContainer}>
     <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
@@ -44,9 +41,6 @@ type KripAiScreenNavigationProp = NativeStackNavigationProp<
   'KripAiChat'
 >;
 
-/* =========================================
-   Single chat message
-========================================= */
 const Chatmessage = ({ chat }) => {
   const isUser = chat.role === 'user';
   if (chat.text == null) return null;
@@ -78,9 +72,6 @@ const Chatmessage = ({ chat }) => {
   );
 };
 
-/* =========================================
-   Live prices (CoinGecko)
-========================================= */
 const COINGECKO_IDS = {
   BTC: 'bitcoin',
   ETH: 'ethereum',
@@ -110,7 +101,7 @@ function useLivePrices() {
         XRP: j?.ripple?.usd ?? 0.55,
       });
     } catch {
-      // Keep previous prices on error
+      // do nothing, keep working
     }
   }, []);
 
@@ -149,9 +140,6 @@ async function callGemini(prompt: string) {
   }
 }
 
-/* =========================================
-   Crypto Assistant Logic
-========================================= */
 function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
   const { prices } = useLivePrices();
   const [portfolio, setPortfolio] = useState({
@@ -324,9 +312,6 @@ function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
   return { handle };
 }
 
-/* =========================================
-   Quick Action Buttons
-========================================= */
 const QuickActions = ({ onAction }) => {
   return (
     <View style={styles.quickActionsContainer}>
@@ -336,6 +321,7 @@ const QuickActions = ({ onAction }) => {
       >
         <Text style={styles.quickActionText}>Show me other options</Text>
       </TouchableOpacity> */}
+      {/* commented as no need */}
     </View>
   );
 };

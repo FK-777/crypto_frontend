@@ -25,9 +25,9 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   const handleSendLink = () => {
     if (!emailOrPhone.trim()) {
       alert('Please enter your email or phone number');
+      // no big deal! ho jasi
       return;
     }
-    // Add your reset password logic here
     console.log('Send reset link to:', emailOrPhone);
     onNavigateToResetPassword();
   };

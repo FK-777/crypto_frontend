@@ -43,7 +43,6 @@ export const SignupScreen: React.FC<SignupScreenProps> = ({
       alert('Passwords do not match');
       return;
     }
-    // Add your signup logic here
     console.log('Signup:', { username, email, password, dateOfBirth, gender });
     onSignupSuccess();
   };

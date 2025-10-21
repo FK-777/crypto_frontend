@@ -13,9 +13,6 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
-/* =========================================
-   Types
-========================================= */
 interface Order {
   id: string;
   type: 'Limit / Buy' | 'Limit / Sell';
@@ -25,9 +22,6 @@ interface Order {
   createdOn: string;
 }
 
-/* =========================================
-   Order Card Component
-========================================= */
 const OrderCard = ({ order, onEdit, onDelete }) => {
   const isBuy = order.type === 'Limit / Buy';
 
@@ -75,9 +69,6 @@ const OrderCard = ({ order, onEdit, onDelete }) => {
   );
 };
 
-/* =========================================
-   Edit Order Modal
-========================================= */
 const EditOrderModal = ({ visible, order, onClose, onSave }) => {
   const [orderType, setOrderType] = useState(order?.type || 'Limit / Sell');
   const [coin, setCoin] = useState(order?.coin || 'BNB / USDT');
@@ -256,9 +247,6 @@ export const LimitOrdersScreen = ({ navigation }: { navigation: any }) => {
   );
 };
 
-/* =========================================
-   Styles
-========================================= */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

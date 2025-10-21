@@ -7,7 +7,6 @@ import { AlertsScreen } from '../screens/AlertsScreen';
 // import { EditAlertScreen } from '../screens/EditAlertScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
-// Define the param list for type safety
 export type MarketStackParamList = {
   MarketList: undefined;
   MarketDetail: {

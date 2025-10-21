@@ -100,12 +100,10 @@ export default function App() {
     }, 400);
   };
 
-  // Show auth screens if not authenticated
   if (!isAuthenticated) {
     return <AuthNavigator onAuthSuccess={() => setIsAuthenticated(true)} />;
   }
 
-  // Show main app if authenticated
   return (
     <>
       <NavigationContainer>

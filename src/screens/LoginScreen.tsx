@@ -28,14 +28,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    // Add your login logic here
     console.log('Login:', emailOrPhone, password);
-    // For now, just navigate to main app
+    // For now, just navigate to main app | sheeda kenda ani paa de
     onLoginSuccess();
   };
 
   const handleGoogleLogin = () => {
-    // Add Google login logic here
     console.log('Google login');
   };
 
