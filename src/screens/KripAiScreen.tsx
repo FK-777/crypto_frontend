@@ -21,6 +21,9 @@ import {
 import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { KripAiStackParamList } from '../navigation/KripAIStackNavigator';
+import { useNavigation } from '@react-navigation/native';
 
 /* =========================================
    Bot Avatar Icon
@@ -35,6 +38,11 @@ const BotAvatar = () => (
     </Svg>
   </View>
 );
+
+type KripAiScreenNavigationProp = NativeStackNavigationProp<
+  KripAiStackParamList,
+  'KripAiChat'
+>;
 
 /* =========================================
    Single chat message
@@ -322,12 +330,12 @@ function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
 const QuickActions = ({ onAction }) => {
   return (
     <View style={styles.quickActionsContainer}>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.quickActionButton}
         onPress={() => onAction('Show me other options')}
       >
         <Text style={styles.quickActionText}>Show me other options</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -377,7 +385,8 @@ const Chatform = ({ chatHistory, setChatHistory, generateBotResponse }) => {
 /* =========================================
    Main KRIP AI Screen
 ========================================= */
-export const KripAiScreen = () => {
+export const KripAiScreen = ({ navigation }: any) => {
+  // const navigation = useNavigation<KripAiScreenNavigationProp>();
   const [transakUrl, setTransakUrl] = useState('');
   const [showTransak, setShowTransak] = useState(false);
   const [amountModal, setAmountModal] = useState({
@@ -506,11 +515,18 @@ export const KripAiScreen = () => {
       >
         <View style={styles.header}>
           <Text style={styles.headerTitle}>KRIP Chatbot</Text>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.menuButton}
             onPress={() => setShowMenu(true)}
           >
-            <Icon name="menu" size={24} color="#333" />
+            <Icon name="menu" size={20} color="#333" />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('LimitOrders')}
+          >
+            <Icon name="list" size={20} color="#333" />
+            {/* <Text style={styles.menuItemText}>Limit Orders</Text> */}
           </TouchableOpacity>
         </View>
 
@@ -610,10 +626,37 @@ export const KripAiScreen = () => {
             onPress={() => setShowMenu(false)}
           >
             <View style={styles.menuCard}>
-              <TouchableOpacity style={styles.menuItem}>
+              {/* NEW: Limit Orders menu item */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  navigation.navigate('LimitOrders');
+                }}
+              >
+                <Icon name="list" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Limit Orders</Text>
+              </TouchableOpacity>
+
+              {/* UPDATED: Clear Chat with functionality */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  setChatHistory([
+                    {
+                      role: 'model',
+                      text: "Hello, I'm FitBot! 👋 I'm your personal sport assistant. How can I help you?",
+                      timestamp: 'Wed 8:21 AM',
+                    },
+                  ]);
+                }}
+              >
                 <Icon name="trash-2" size={20} color="#333" />
                 <Text style={styles.menuItemText}>Clear Chat</Text>
               </TouchableOpacity>
+
+              {/* EXISTING: Settings (no change) */}
               <TouchableOpacity style={styles.menuItem}>
                 <Icon name="settings" size={20} color="#333" />
                 <Text style={styles.menuItemText}>Settings</Text>

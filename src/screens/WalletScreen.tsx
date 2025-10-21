@@ -175,11 +175,17 @@ export const WalletScreen: React.FC<WalletScreenProps> = ({ navigation }) => {
         </View>
 
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('Send')}
+          >
             <Icon name="arrow-up" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Send</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('Receive')}
+          >
             <Icon name="arrow-down" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Receive</Text>
           </TouchableOpacity>

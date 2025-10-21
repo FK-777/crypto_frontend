@@ -20,6 +20,7 @@ import { AuthNavigator } from './src/navigation/AuthNavigator';
 import { WebView } from 'react-native-webview';
 import { TaxScreen } from './src/screens/TaxScreen';
 import { WalletStackNavigator } from './src/navigation/WalletStackNavigator';
+import { KripAiNavigator } from './src/navigation/KripAIStackNavigator';
 
 // Empty component since we use the bottom sheet
 function TradeScreen() {
@@ -127,7 +128,7 @@ export default function App() {
           })}
         >
           <Tab.Screen name="Market" component={MarketStackNavigator} />
-          <Tab.Screen name="KRIP AI" component={KripAiScreen} />
+          <Tab.Screen name="KRIP AI" component={KripAiNavigator} />
           <Tab.Screen
             name="Trade"
             component={TradeScreen}
