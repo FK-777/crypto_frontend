@@ -12,25 +12,28 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { ConvertScreen } from './src/screens/ConvertScreen';
-import { MarketScreen } from './src/screens/MarketScreen';
+import { MarketStackNavigator } from './src/navigation/MarketStackNavigator';
 import { ChooseCryptoScreen } from './src/screens/ChooseCryptoScreen';
 import { ChooseCurrencyScreen } from './src/screens/ChooseCurrencyScreen';
 import { KripAiScreen } from './src/screens/KripAiScreen';
 import { AuthNavigator } from './src/navigation/AuthNavigator';
 import { WebView } from 'react-native-webview';
+import { TaxScreen } from './src/screens/TaxScreen';
+import { WalletStackNavigator } from './src/navigation/WalletStackNavigator';
+import { KripAiNavigator } from './src/navigation/KripAIStackNavigator';
 
 // Empty component since we use the bottom sheet
 function TradeScreen() {
   return null;
 }
 
-function TaxScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Tax Screen</Text>
-    </View>
-  );
-}
+// function TaxScreen() {
+//   return (
+//     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+//       <Text>Tax Screen</Text>
+//     </View>
+//   );
+// }
 
 const Tab = createBottomTabNavigator();
 
@@ -97,12 +100,10 @@ export default function App() {
     }, 400);
   };
 
-  // Show auth screens if not authenticated
   if (!isAuthenticated) {
     return <AuthNavigator onAuthSuccess={() => setIsAuthenticated(true)} />;
   }
 
-  // Show main app if authenticated
   return (
     <>
       <NavigationContainer>
@@ -124,8 +125,8 @@ export default function App() {
             headerShown: false,
           })}
         >
-          <Tab.Screen name="Market" component={MarketScreen} />
-          <Tab.Screen name="KRIP AI" component={KripAiScreen} />
+          <Tab.Screen name="Market" component={MarketStackNavigator} />
+          <Tab.Screen name="KRIP AI" component={KripAiNavigator} />
           <Tab.Screen
             name="Trade"
             component={TradeScreen}
@@ -159,7 +160,7 @@ export default function App() {
             }}
           />
           <Tab.Screen name="Tax" component={TaxScreen} />
-          <Tab.Screen name="Wallet" component={WalletScreen} />
+          <Tab.Screen name="Wallet" component={WalletStackNavigator} />
         </Tab.Navigator>
       </NavigationContainer>
 

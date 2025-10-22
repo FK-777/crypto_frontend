@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Modal,
   SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { Asset } from '../types';
@@ -32,7 +34,11 @@ const assets: Asset[] = [
   },
 ];
 
-export const WalletScreen = () => {
+interface WalletScreenProps {
+  navigation: any;
+}
+
+export const WalletScreen: React.FC<WalletScreenProps> = ({ navigation }) => {
   const [showAssetAllocation, setShowAssetAllocation] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [hideZeroBalance, setHideZeroBalance] = useState(false);
@@ -47,7 +53,10 @@ export const WalletScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('AccountInfo')}
+          >
             <Icon name="user" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.title}>Portfolio</Text>
@@ -68,7 +77,7 @@ export const WalletScreen = () => {
           </View>
 
           <View style={styles.amountRow}>
-            <Text style={styles.balanceAmount}>70,000.00</Text>
+            <Text style={styles.balanceAmount}>$90,000.00</Text>
             <View style={styles.changeContainer}>
               <View style={styles.changeBadge}>
                 <Text style={styles.changeText}>+ $200</Text>
@@ -166,19 +175,31 @@ export const WalletScreen = () => {
         </View>
 
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('Send')}
+          >
             <Icon name="arrow-up" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Send</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('Receive')}
+          >
             <Icon name="arrow-down" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Receive</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('Swap')}
+          >
             <Icon name="repeat" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Swap</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('BuySell')}
+          >
             <Icon name="credit-card" size={20} color="#333" />
             <Text style={styles.actionButtonText}>Buy/Sell</Text>
           </TouchableOpacity>
@@ -186,7 +207,10 @@ export const WalletScreen = () => {
 
         <View style={styles.assetListContainer}>
           <View style={styles.assetListHeader}>
-            <TouchableOpacity style={styles.checkbox}>
+            <TouchableOpacity
+              style={styles.checkbox}
+              onPress={() => setHideZeroBalance(!hideZeroBalance)}
+            >
               <View
                 style={[
                   styles.checkboxBox,
@@ -237,6 +261,7 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   container: {
     flex: 1,

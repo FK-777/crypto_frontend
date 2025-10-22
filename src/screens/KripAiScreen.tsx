@@ -16,93 +16,69 @@ import {
   KeyboardAvoidingView,
   Modal,
   SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import Svg, { ClipPath, Defs, G, Path, Rect } from 'react-native-svg';
 import { WebView } from 'react-native-webview';
 import Icon from 'react-native-vector-icons/Feather';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { KripAiStackParamList } from '../navigation/KripAIStackNavigator';
+import { useNavigation } from '@react-navigation/native';
 
-/* =========================================
-   Chat Avatar Icon
-========================================= */
-const Chatboticon = () => (
-  <Svg width={19} height={18} viewBox="0 0 19 18" fill="none">
-    <G clipPath="url(#clip0_94_1875)">
+const BotAvatar = () => (
+  <View style={styles.botAvatarContainer}>
+    <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">
       <Path
-        d="M5.92226 17.3521C5.92226 16.5576 5.92226 15.8046 5.92226 15.0295C5.8301 15.0267 5.75522 15.0184 5.68034 15.0184C5.19938 15.0184 4.71554 15.0212 4.23458 15.0184C2.86082 14.0073 1.8701 14.0883 1.85858 12.765C1.8413 10.6971 1.84418 8.62646 1.85858 6.55856C1.86722 5.22702 2.86082 4.29964 4.24898 4.29688C7.45154 4.29411 10.657 4.29411 13.8595 4.29688C15.2477 4.29964 16.2355 5.22425 16.2471 6.55856C16.2615 8.62093 16.2615 10.6833 16.2471 12.7457C16.2384 14.091 15.2506 15.0101 13.848 15.0184C12.4944 15.0267 11.1408 15.0323 9.78722 15.0489C9.6461 15.0516 9.49058 15.0987 9.3725 15.1734C8.28674 15.8544 7.20962 16.5437 6.12962 17.2303C6.0749 17.2635 6.02018 17.2939 5.92226 17.3521ZM6.16706 10.9186C6.15554 12.0619 7.59266 13.1941 9.01538 13.1747C10.4583 13.1554 11.8752 12.0148 11.8176 10.9186C9.93698 10.9186 8.05058 10.9186 6.16706 10.9186ZM7.89218 7.62158C7.89218 7.00702 7.37666 6.5115 6.7373 6.51427C6.10082 6.51704 5.58818 7.01533 5.59106 7.62988C5.59394 8.24167 6.11234 8.73996 6.74594 8.7372C7.38242 8.73443 7.89218 8.23891 7.89218 7.62158ZM12.5232 7.6548C12.5405 7.04301 12.0451 6.53918 11.4 6.51704C10.7751 6.49489 10.2307 6.99318 10.2163 7.59943C10.2019 8.20845 10.7059 8.72059 11.3424 8.7372C11.976 8.75657 12.5059 8.26936 12.5232 7.6548Z"
-        fill="white"
+        d="M12 2C10.34 2 9 3.34 9 5V6H7C5.9 6 5 6.9 5 8V18C5 19.1 5.9 20 7 20H17C18.1 20 19 19.1 19 18V8C19 6.9 18.1 6 17 6H15V5C15 3.34 13.66 2 12 2ZM12 4C12.55 4 13 4.45 13 5V6H11V5C11 4.45 11.45 4 12 4ZM9 11C9.55 11 10 11.45 10 12C10 12.55 9.55 13 9 13C8.45 13 8 12.55 8 12C8 11.45 8.45 11 9 11ZM15 11C15.55 11 16 11.45 16 12C16 12.55 15.55 13 15 13C14.45 13 14 12.55 14 12C14 11.45 14.45 11 15 11ZM8 15H16V16H8V15Z"
+        fill="#FF8C00"
       />
-      <Path
-        d="M1.3659 7.73783C1.3659 9.06383 1.3659 10.3622 1.3659 11.7048C1.10094 11.6909 0.835979 11.7075 0.582539 11.6577C0.271499 11.5968 0.0612594 11.3311 0.0583794 11.0238C0.0497394 10.1518 0.0468594 9.27976 0.0583794 8.41052C0.0641394 8.04788 0.352139 7.77105 0.723659 7.7406C0.928139 7.72399 1.13838 7.73783 1.3659 7.73783Z"
-        fill="white"
-      />
-      <Path
-        d="M16.7422 7.74886C16.9956 7.74886 17.2404 7.72394 17.4766 7.75439C17.7847 7.79592 18.0353 8.07551 18.0411 8.38002C18.0526 9.26587 18.0555 10.149 18.0411 11.0348C18.0353 11.4002 17.7156 11.677 17.3355 11.6909C17.1425 11.6992 16.9495 11.6909 16.7422 11.6909C16.7422 10.3704 16.7422 9.06102 16.7422 7.74886Z"
-        fill="white"
-      />
-      <Path
-        d="M9.31782 3.38332C9.0903 3.38332 8.89734 3.38332 8.66982 3.38332C8.66982 3.1314 8.66406 2.88779 8.6727 2.64142C8.67846 2.51408 8.64102 2.44764 8.5143 2.39227C8.03046 2.17081 7.78278 1.66975 7.90662 1.1853C8.03046 0.689781 8.47398 0.352051 9.00102 0.352051C9.51654 0.352051 9.97158 0.695317 10.0868 1.16869C10.2106 1.67529 9.97158 2.16527 9.4791 2.39227C9.35526 2.45041 9.31206 2.51131 9.31782 2.64142C9.32646 2.88226 9.31782 3.1231 9.31782 3.38332Z"
-        fill="white"
-      />
-    </G>
-    <Defs>
-      <ClipPath id="clip0_94_1875">
-        <Rect
-          width={18}
-          height={17}
-          fill="white"
-          transform="translate(0.0498047 0.352051)"
-        />
-      </ClipPath>
-    </Defs>
-  </Svg>
+    </Svg>
+  </View>
 );
 
-/* =========================================
-   Single chat message
-========================================= */
-type ChatMessageType = {
-  role: string;
-  text?: string;
-  isError?: boolean;
-};
+type KripAiScreenNavigationProp = NativeStackNavigationProp<
+  KripAiStackParamList,
+  'KripAiChat'
+>;
 
-const Chatmessage = ({ chat }: { chat: ChatMessageType }) => {
+const Chatmessage = ({ chat }) => {
   const isUser = chat.role === 'user';
   if (chat.text == null) return null;
   return (
-    <View
-      style={[
-        styles.messageWrapper,
-        isUser ? styles.userMessage : styles.botMessage,
-      ]}
-    >
-      {isUser ? (
-        <View style={styles.userIcon}>
-          <Icon name="user" size={20} color="#666" />
-        </View>
-      ) : (
-        <View style={styles.botIcon}>
-          <Chatboticon />
+    <View style={styles.messageContainer}>
+      {!isUser && (
+        <View style={styles.botAvatarWrapper}>
+          <BotAvatar />
+          <Text style={styles.botLabel}>FitBot</Text>
+          <View style={styles.activeIndicator}>
+            <Text style={styles.activeText}>● Always active</Text>
+          </View>
         </View>
       )}
-      <View style={isUser ? styles.userMessageBubble : styles.botMessageBubble}>
-        <Text style={{ color: chat.isError ? '#B00020' : '#111' }}>
+      <View
+        style={[
+          styles.messageBubble,
+          isUser ? styles.userBubble : styles.botBubble,
+        ]}
+      >
+        <Text style={[styles.messageText, isUser && styles.userMessageText]}>
           {chat.text}
         </Text>
       </View>
+      {!isUser && chat.timestamp && (
+        <Text style={styles.timestamp}>{chat.timestamp}</Text>
+      )}
     </View>
   );
 };
 
-/* =========================================
-   Live prices (CoinGecko)
-========================================= */
 const COINGECKO_IDS = {
   BTC: 'bitcoin',
   ETH: 'ethereum',
   SOL: 'solana',
   XRP: 'ripple',
 };
+
 function useLivePrices() {
   const [prices, setPrices] = useState({
     BTC: 65000,
@@ -125,7 +101,7 @@ function useLivePrices() {
         XRP: j?.ripple?.usd ?? 0.55,
       });
     } catch {
-      // Keep previous prices on error
+      // do nothing, keep working
     }
   }, []);
 
@@ -141,7 +117,7 @@ function useLivePrices() {
 /* =========================================
    Gemini API call
 ========================================= */
-async function callGemini(prompt) {
+async function callGemini(prompt: string) {
   const API_KEY = 'AIzaSyAkjLpOvf09DLjcL_THHCKpc6nCKZAd4TM';
   try {
     const response = await fetch(
@@ -164,9 +140,6 @@ async function callGemini(prompt) {
   }
 }
 
-/* =========================================
-   Crypto Assistant Logic
-========================================= */
 function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
   const { prices } = useLivePrices();
   const [portfolio, setPortfolio] = useState({
@@ -188,23 +161,23 @@ function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
     [],
   );
 
-  const isCryptoIntent = m =>
+  const isCryptoIntent = (m: string) =>
     /(btc|bitcoin|eth|ethereum|sol|solana|xrp|ripple|crypto|coin|wallet|exchange|trade|price|portfolio|buy|sell|tax|staking|defi)/i.test(
       m,
     );
 
-  const isQuestion = m =>
+  const isQuestion = (m: string) =>
     /\?\s*$/.test(m) ||
     /^(can|how|what|why|when|where|which|should|is|are|do|does|did|will|would|could|may|might)\b/i.test(
       m,
     );
 
-  const fmt = n =>
+  const fmt = (n: number) =>
     `$${Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
-  const brand = txt => `${txt}\n\n— KRIP AI Assistant`;
+  const brand = (txt: string) => `${txt}\n\n— KRIP AI Assistant`;
 
   const handle = useCallback(
-    async message => {
+    async (message: any) => {
       const m = (message || '').trim();
       const lower = m.toLowerCase();
 
@@ -339,33 +312,17 @@ function useCryptoAssistant({ onOpenTransak, openAmountModal } = {}) {
   return { handle };
 }
 
-/* =========================================
-   Quick Action Chips
-========================================= */
-const QuickChips = ({ onPick }) => {
-  const chips = [
-    { label: 'Prices', text: 'price' },
-    { label: 'Portfolio', text: 'portfolio' },
-    { label: 'Buy BTC $100', text: 'buy btc 100' },
-    { label: 'News', text: 'news' },
-    { label: 'Help', text: 'help' },
-  ];
+const QuickActions = ({ onAction }) => {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.chipsContainer}
-    >
-      {chips.map(c => (
-        <TouchableOpacity
-          key={c.label}
-          onPress={() => onPick(c.text)}
-          style={styles.chip}
-        >
-          <Text style={styles.chipText}>{c.label}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+    <View style={styles.quickActionsContainer}>
+      {/* <TouchableOpacity
+        style={styles.quickActionButton}
+        onPress={() => onAction('Show me other options')}
+      >
+        <Text style={styles.quickActionText}>Show me other options</Text>
+      </TouchableOpacity> */}
+      {/* commented as no need */}
+    </View>
   );
 };
 
@@ -375,12 +332,12 @@ const QuickChips = ({ onPick }) => {
 const Chatform = ({ chatHistory, setChatHistory, generateBotResponse }) => {
   const [input, setInput] = useState('');
 
-  const send = text => {
+  const send = (text: string) => {
     if (!text.trim()) return;
     const updated = [
       ...chatHistory,
       { role: 'user', text },
-      { role: 'model', text: 'Thinking...' },
+      { role: 'model', text: 'Thinking...', timestamp: null },
     ];
     setChatHistory(updated);
     generateBotResponse(updated);
@@ -388,18 +345,21 @@ const Chatform = ({ chatHistory, setChatHistory, generateBotResponse }) => {
   };
 
   return (
-    <View style={styles.formContainer}>
-      <QuickChips onPick={send} />
+    <View style={styles.inputWrapper}>
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Ask me anything about crypto..."
+          placeholder="Type a message..."
           value={input}
           onChangeText={setInput}
           style={styles.input}
           returnKeyType="send"
           onSubmitEditing={() => send(input)}
           placeholderTextColor="#999"
+          multiline
         />
+        <TouchableOpacity style={styles.micButton}>
+          <Icon name="mic" size={20} color="#666" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => send(input)} style={styles.sendButton}>
           <Icon name="send" size={20} color="#fff" />
         </TouchableOpacity>
@@ -411,7 +371,8 @@ const Chatform = ({ chatHistory, setChatHistory, generateBotResponse }) => {
 /* =========================================
    Main KRIP AI Screen
 ========================================= */
-export const KripAiScreen = () => {
+export const KripAiScreen = ({ navigation }: any) => {
+  // const navigation = useNavigation<KripAiScreenNavigationProp>();
   const [transakUrl, setTransakUrl] = useState('');
   const [showTransak, setShowTransak] = useState(false);
   const [amountModal, setAmountModal] = useState({
@@ -420,8 +381,9 @@ export const KripAiScreen = () => {
     symbol: 'BTC',
     amount: '',
   });
+  const [showMenu, setShowMenu] = useState(false);
 
-  const openAmountModal = (side, symbol) =>
+  const openAmountModal = (side: string, symbol: any) =>
     setAmountModal({
       open: true,
       side: side === 'buy' ? 'Buy' : 'Sell',
@@ -429,7 +391,7 @@ export const KripAiScreen = () => {
       amount: '',
     });
 
-  const openTransak = useCallback((symbol, amount, side) => {
+  const openTransak = useCallback((symbol: string, amount: any, side: any) => {
     const apiKey = '8dd96a64-fedb-4153-98db-d168a878f23a';
     const walletAddress = '0xf0c6Eb0f878f8c91C2711a10900d3B9D0CF8B221';
     const network =
@@ -450,19 +412,30 @@ export const KripAiScreen = () => {
   }, []);
 
   const { handle } = useCryptoAssistant({
-    onOpenTransak: (sym, amt, side) => openTransak(sym, amt, side),
+    onOpenTransak: (sym: any, amt: any, side: any) =>
+      openTransak(sym, amt, side),
     openAmountModal,
   });
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
 
   const [chatHistory, setChatHistory] = useState([
     {
       role: 'model',
-      text: "👋 Welcome to KRIP AI!\n\nI can help you with crypto prices, trading, portfolio management, and answer your questions.\n\nTry: 'price btc', 'buy eth 50', or ask me anything!\n\n— KRIP AI Assistant",
+      text: "Hello, I'm FitBot! 👋 I'm your personal sport assistant. How can I help you?",
+      timestamp: 'Wed 8:21 AM',
     },
   ]);
   const scrollRef = useRef();
 
-  const generateBotResponse = async history => {
+  const generateBotResponse = async (history: any) => {
     const lastUser = [...history].reverse().find(m => m.role === 'user');
     try {
       const { text } = await handle(lastUser?.text || '');
@@ -473,7 +446,7 @@ export const KripAiScreen = () => {
         if (text == null) {
           copy.splice(idx, 1);
         } else {
-          copy.splice(idx, 1, { role: 'model', text });
+          copy.splice(idx, 1, { role: 'model', text, timestamp: null });
         }
         return copy;
       });
@@ -486,6 +459,7 @@ export const KripAiScreen = () => {
           role: 'model',
           text: 'Sorry, something went wrong.',
           isError: true,
+          timestamp: null,
         });
         return copy;
       });
@@ -509,6 +483,16 @@ export const KripAiScreen = () => {
     setAmountModal(s => ({ ...s, open: false, amount: '' }));
   };
 
+  const handleQuickAction = (text: string) => {
+    const updated = [
+      ...chatHistory,
+      { role: 'user', text },
+      { role: 'model', text: 'Thinking...', timestamp: null },
+    ];
+    setChatHistory(updated);
+    generateBotResponse(updated);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -516,7 +500,20 @@ export const KripAiScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>KRIP AI</Text>
+          <Text style={styles.headerTitle}>KRIP Chatbot</Text>
+          {/* <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => setShowMenu(true)}
+          >
+            <Icon name="menu" size={20} color="#333" />
+          </TouchableOpacity> */}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigation.navigate('LimitOrders')}
+          >
+            <Icon name="list" size={20} color="#333" />
+            {/* <Text style={styles.menuItemText}>Limit Orders</Text> */}
+          </TouchableOpacity>
         </View>
 
         <View style={styles.chatContainer}>
@@ -528,6 +525,9 @@ export const KripAiScreen = () => {
             {chatHistory.map((chat, index) => (
               <Chatmessage key={index} chat={chat} />
             ))}
+            {chatHistory.length === 1 && (
+              <QuickActions onAction={handleQuickAction} />
+            )}
           </ScrollView>
 
           <Chatform
@@ -598,6 +598,58 @@ export const KripAiScreen = () => {
             </View>
           </View>
         </Modal>
+
+        {/* Menu Modal */}
+        <Modal
+          visible={showMenu}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowMenu(false)}
+        >
+          <TouchableOpacity
+            style={styles.menuOverlay}
+            activeOpacity={1}
+            onPress={() => setShowMenu(false)}
+          >
+            <View style={styles.menuCard}>
+              {/* NEW: Limit Orders menu item */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  navigation.navigate('LimitOrders');
+                }}
+              >
+                <Icon name="list" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Limit Orders</Text>
+              </TouchableOpacity>
+
+              {/* UPDATED: Clear Chat with functionality */}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  setChatHistory([
+                    {
+                      role: 'model',
+                      text: "Hello, I'm FitBot! 👋 I'm your personal sport assistant. How can I help you?",
+                      timestamp: 'Wed 8:21 AM',
+                    },
+                  ]);
+                }}
+              >
+                <Icon name="trash-2" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Clear Chat</Text>
+              </TouchableOpacity>
+
+              {/* EXISTING: Settings (no change) */}
+              <TouchableOpacity style={styles.menuItem}>
+                <Icon name="settings" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Settings</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -610,17 +662,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
   header: {
-    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-    alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
     color: '#333',
+    flex: 1,
+    textAlign: 'center',
+  },
+  menuButton: {
+    padding: 4,
   },
   chatContainer: {
     flex: 1,
@@ -631,97 +692,121 @@ const styles = StyleSheet.create({
   chatContent: {
     paddingBottom: 20,
     paddingHorizontal: 16,
+    paddingTop: 16,
   },
-  chipsContainer: {
-    maxHeight: 44,
+  messageContainer: {
+    marginBottom: 24,
+  },
+  botAvatarWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 20,
+  botAvatarContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
   },
-  chipText: {
-    color: '#333',
+  botLabel: {
     fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginRight: 8,
   },
-  formContainer: {
-    paddingTop: 8,
+  activeIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activeText: {
+    fontSize: 12,
+    color: '#00C853',
+  },
+  messageBubble: {
+    maxWidth: '85%',
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    borderRadius: 16,
+  },
+  botBubble: {
+    backgroundColor: '#f5f5f5',
+    alignSelf: 'flex-start',
+    borderTopLeftRadius: 4,
+  },
+  userBubble: {
+    backgroundColor: '#007AFF',
+    alignSelf: 'flex-end',
+    borderTopRightRadius: 4,
+  },
+  messageText: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: '#333',
+  },
+  userMessageText: {
+    color: '#fff',
+  },
+  timestamp: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 4,
+  },
+  quickActionsContainer: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  quickActionButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 24,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  quickActionText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  inputWrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
+    backgroundColor: '#fff',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   input: {
     flex: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 24,
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
+    maxHeight: 100,
+    paddingVertical: 8,
+  },
+  micButton: {
+    padding: 8,
+    marginRight: 4,
   },
   sendButton: {
-    marginLeft: 8,
-    backgroundColor: '#ff8c00',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  messageWrapper: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginVertical: 8,
-  },
-  userMessage: {
-    justifyContent: 'flex-end',
-  },
-  botMessage: {
-    justifyContent: 'flex-start',
-  },
-  userIcon: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#333',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
-  },
-  botIcon: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-    backgroundColor: '#ff8c00',
-    borderRadius: 18,
-  },
-  userMessageBubble: {
-    maxWidth: '75%',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  botMessageBubble: {
-    maxWidth: '75%',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
   },
   closeTransak: {
     flexDirection: 'row',
@@ -794,6 +879,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   btnGhostText: {
+    color: '#333',
+  },
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: 60,
+    paddingRight: 16,
+  },
+  menuCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 8,
+    minWidth: 180,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    gap: 12,
+  },
+  menuItemText: {
+    fontSize: 15,
     color: '#333',
   },
 });

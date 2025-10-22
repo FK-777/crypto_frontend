@@ -20,11 +20,7 @@ export const AuthNavigator: React.FC<AuthNavigatorProps> = ({
   };
 
   const handleSignupSuccess = () => {
-    // After successful signup, you can either:
-    // 1. Auto-login the user
     onAuthSuccess();
-    // 2. Or go back to login
-    // setCurrentScreen('login');
   };
 
   const handleResetSuccess = () => {
