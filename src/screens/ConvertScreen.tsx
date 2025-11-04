@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import Icon from 'react-native-vector-icons/Feather';
@@ -18,9 +20,11 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<'instant' | 'recurring' | 'limit'>(
     'instant',
   );
-  const [selectedPeriod, setSelectedPeriod] = useState('1D');
+  const [selectedPeriod, setSelectedPeriod] = useState('7D');
+  const [fromAmount, setFromAmount] = useState('0.00145667');
+  const [toAmount, setToAmount] = useState('1');
 
-  const periods = ['1D', '1W', '1M'];
+  const periods = ['7D', '30D', '180D', '360D'];
 
   const chartData = {
     labels: ['', '', '', '', '', ''],
@@ -31,6 +35,300 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
     ],
   };
 
+  const renderInstantTab = () => (
+    <>
+      <View style={styles.rateContainer}>
+        <Text style={styles.rateText}>1 MIRA = 0.00145667 BNB</Text>
+        <Text style={styles.rateChange}>-2.96%</Text>
+      </View>
+
+      <View style={styles.chartContainer}>
+        <LineChart
+          data={chartData}
+          width={Dimensions.get('window').width}
+          height={200}
+          chartConfig={{
+            backgroundColor: '#fff',
+            backgroundGradientFrom: '#FFFBF5',
+            backgroundGradientTo: '#FFFBF5',
+            decimalPlaces: 6,
+            color: (opacity = 1) => `rgba(255, 140, 0, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            propsForDots: { r: '0' },
+          }}
+          bezier
+          style={styles.chart}
+          withHorizontalLabels={false}
+          withVerticalLabels={false}
+          withDots={false}
+          withInnerLines={false}
+          withOuterLines={false}
+        />
+      </View>
+
+      <View style={styles.periodSelector}>
+        {periods.map(period => (
+          <TouchableOpacity
+            key={period}
+            style={[
+              styles.periodButton,
+              selectedPeriod === period && styles.periodButtonActive,
+            ]}
+            onPress={() => setSelectedPeriod(period)}
+          >
+            <Text
+              style={[
+                styles.periodText,
+                selectedPeriod === period && styles.periodTextActive,
+              ]}
+            >
+              {period}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.convertContainer}>
+        <View style={styles.currencySection}>
+          <Text style={styles.sectionLabel}>From</Text>
+          <View style={styles.inputCard}>
+            <View style={styles.inputLeft}>
+              <TouchableOpacity style={styles.currencySelector}>
+                <View style={styles.currencyIconSmall}>
+                  <Text style={styles.currencyIconText}>🔶</Text>
+                </View>
+                <Text style={styles.currencyName}>BNB</Text>
+                <Icon name="chevron-down" size={16} color="#999" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.inputRight}>
+              <TextInput
+                style={styles.amountInput}
+                value={fromAmount}
+                onChangeText={setFromAmount}
+                keyboardType="decimal-pad"
+                placeholderTextColor="#ccc"
+              />
+              <Text style={styles.balanceText}>Balance = 2</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.conversionRate}>
+          <Text style={styles.conversionText}>1 BTC = 6 MIRA</Text>
+          <TouchableOpacity style={styles.swapButton}>
+            <Icon name="repeat" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.currencySection}>
+          <Text style={styles.sectionLabel}>To</Text>
+          <View style={styles.inputCard}>
+            <View style={styles.inputLeft}>
+              <TouchableOpacity style={styles.currencySelector}>
+                <View style={styles.currencyIconSmall}>
+                  <Text style={styles.currencyIconText}>💎</Text>
+                </View>
+                <Text style={styles.currencyName}>MIRA</Text>
+                <Icon name="chevron-down" size={16} color="#999" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.inputRight}>
+              <TextInput
+                style={styles.amountInput}
+                value={toAmount}
+                onChangeText={setToAmount}
+                keyboardType="decimal-pad"
+                placeholderTextColor="#ccc"
+              />
+              <Text style={styles.balanceText}>Balance = 20</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.actionButton}>
+        <Text style={styles.actionButtonText}>Swap Now</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  const renderRecurringTab = () => (
+    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.currencySection}>
+        <Text style={styles.sectionLabel}>From</Text>
+        <View style={styles.inputCard}>
+          <View style={styles.inputLeft}>
+            <TouchableOpacity style={styles.currencySelector}>
+              <View style={styles.currencyIconSmall}>
+                <Text style={styles.currencyIconText}>🔶</Text>
+              </View>
+              <Text style={styles.currencyName}>BNB</Text>
+              <Icon name="chevron-down" size={16} color="#999" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputRight}>
+            <Text style={styles.amountRange}>0.1 - 490000</Text>
+            <Text style={styles.balanceText}>Balance = 2</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.conversionRate}>
+        <Text style={styles.conversionText}>1 BTC = 6 MIRA</Text>
+        <TouchableOpacity style={styles.swapButton}>
+          <Icon name="repeat" size={20} color="#666" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.currencySection}>
+        <Text style={styles.sectionLabel}>
+          To <Text style={styles.percentageLabel}>(100% / 100%)</Text>
+        </Text>
+        <View style={styles.inputCard}>
+          <View style={styles.inputLeft}>
+            <TouchableOpacity style={styles.currencySelector}>
+              <View style={styles.currencyIconSmall}>
+                <Text style={styles.currencyIconText}>💎</Text>
+              </View>
+              <Text style={styles.currencyName}>MIRA</Text>
+              <Icon name="chevron-down" size={16} color="#999" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputRight}>
+            <Text style={styles.amountInputLarge}>100%</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.settingsSection}>
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Frequency</Text>
+          <TouchableOpacity style={styles.settingValue}>
+            <Text style={styles.settingValueText}>Daily, 00:00 (UTC)+5</Text>
+            <Icon name="chevron-down" size={16} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Asset Destination</Text>
+          <TouchableOpacity style={styles.settingValue}>
+            <Text style={styles.settingValueText}>Spot Amount</Text>
+            <Icon name="chevron-down" size={16} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Plan Name</Text>
+          <TouchableOpacity style={styles.settingValue}>
+            <Text style={styles.settingValueText}>BTC Recurring Plan</Text>
+            <Icon name="chevron-down" size={16} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Max Period</Text>
+          <TouchableOpacity style={styles.settingValue}>
+            <Text style={styles.settingValueText}>--</Text>
+            <Icon name="chevron-down" size={16} color="#333" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingLabel}>Limit Price</Text>
+          <TouchableOpacity style={styles.settingValue}>
+            <Text style={styles.settingValueText}>--</Text>
+            <Icon name="chevron-down" size={16} color="#333" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.actionButton}>
+        <Text style={styles.actionButtonText}>Create a Plan</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+
+  const renderLimitTab = () => (
+    <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.currencySection}>
+        <Text style={styles.sectionLabel}>From</Text>
+        <View style={styles.inputCard}>
+          <View style={styles.inputLeft}>
+            <TouchableOpacity style={styles.currencySelector}>
+              <View style={styles.currencyIconSmall}>
+                <Text style={styles.currencyIconText}>🔶</Text>
+              </View>
+              <Text style={styles.currencyName}>BNB</Text>
+              <Icon name="chevron-down" size={16} color="#999" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputRight}>
+            <Text style={styles.amountRange}>0.00 - 7.9</Text>
+            <Text style={styles.balanceText}>Balance = 2</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.conversionRate}>
+        <Text style={styles.conversionText}>1 BTC = 6 MIRA</Text>
+        <TouchableOpacity style={styles.swapButton}>
+          <Icon name="repeat" size={20} color="#666" />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.currencySection}>
+        <Text style={styles.sectionLabel}>To</Text>
+        <View style={styles.inputCard}>
+          <View style={styles.inputLeft}>
+            <TouchableOpacity style={styles.currencySelector}>
+              <View style={styles.currencyIconSmall}>
+                <Text style={styles.currencyIconText}>💎</Text>
+              </View>
+              <Text style={styles.currencyName}>MIRA</Text>
+              <Icon name="chevron-down" size={16} color="#999" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputRight}>
+            <Text style={styles.amountRange}>0.035 - 270</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.currencySection}>
+        <Text style={styles.sectionLabel}>From</Text>
+        <View style={styles.inputCard}>
+          <View style={styles.inputLeft}>
+            <View style={styles.currencySelectorStatic}>
+              <View style={styles.currencyIconSmall}>
+                <Text style={styles.currencyIconText}>🔶</Text>
+              </View>
+              <Text style={styles.currencyName}>BNB</Text>
+            </View>
+          </View>
+          <View style={styles.inputRight}>
+            <Text style={styles.amountInputLarge}>0.00145667</Text>
+            <Text style={styles.balanceText}>Balance = 2</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.expiresSection}>
+        <Text style={styles.expiresLabel}>Expires in</Text>
+        <TouchableOpacity style={styles.expiresValue}>
+          <Text style={styles.expiresValueText}>Expires in 30 Days</Text>
+          <Icon name="chevron-down" size={16} color="#333" />
+        </TouchableOpacity>
+      </View>
+
+      <TouchableOpacity style={styles.previewButton}>
+        <Text style={styles.previewButtonText}>Preview</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -38,7 +336,9 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
           <Icon name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Convert</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity style={styles.iconButton}>
+          <Icon name="bar-chart-2" size={24} color="#333" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
@@ -83,120 +383,9 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.rateContainer}>
-        <Text style={styles.rateText}>1 MIRA = 0.00145667 BNB</Text>
-        <Text style={styles.rateChange}>-2.96%</Text>
-      </View>
-
-      <View style={styles.chartContainer}>
-        <LineChart
-          data={chartData}
-          width={Dimensions.get('window').width}
-          height={200}
-          chartConfig={{
-            backgroundColor: '#fff',
-            backgroundGradientFrom: '#fff',
-            backgroundGradientTo: '#fff',
-            decimalPlaces: 6,
-            color: (opacity = 1) => `rgba(255, 140, 0, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            propsForDots: {
-              r: '0',
-            },
-          }}
-          bezier
-          style={styles.chart}
-          withHorizontalLabels={false}
-          withVerticalLabels={false}
-          withDots={false}
-          withInnerLines={false}
-          withOuterLines={false}
-        />
-      </View>
-
-      <View style={styles.periodSelector}>
-        {periods.map(period => (
-          <TouchableOpacity
-            key={period}
-            style={[
-              styles.periodButton,
-              selectedPeriod === period && styles.periodButtonActive,
-            ]}
-            onPress={() => setSelectedPeriod(period)}
-          >
-            <Text
-              style={[
-                styles.periodText,
-                selectedPeriod === period && styles.periodTextActive,
-              ]}
-            >
-              {period}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={styles.infoButton}>
-          <Icon name="info" size={16} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.convertContainer}>
-        <View style={styles.currencySection}>
-          <Text style={styles.sectionLabel}>From</Text>
-          <View style={styles.availableContainer}>
-            <Text style={styles.availableText}>Available 0.00030437 BNB</Text>
-          </View>
-          <TouchableOpacity style={styles.currencyCard}>
-            <View style={styles.currencyLeft}>
-              <View style={styles.currencyIcon}>
-                <Text style={styles.currencyIconText}>🔶</Text>
-              </View>
-              <View style={styles.currencyInfo}>
-                <Text style={styles.currencyName}>BNB</Text>
-                <Text style={styles.currencySubtext}>ETHW</Text>
-              </View>
-              <View style={styles.dropdownIcon}>
-                <Icon name="chevron-down" size={20} color="#999" />
-              </View>
-            </View>
-            <View style={styles.currencyRight}>
-              <Text style={styles.amountRange}>0.00001 - 8.2</Text>
-              <TouchableOpacity>
-                <Text style={styles.maxButton}>Max</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.swapIconContainer}>
-          <TouchableOpacity style={styles.swapButton}>
-            <Icon name="repeat" size={20} color="#666" />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.currencySection}>
-          <Text style={styles.sectionLabel}>To</Text>
-          <TouchableOpacity style={styles.currencyCard}>
-            <View style={styles.currencyLeft}>
-              <View style={styles.currencyIcon}>
-                <Text style={styles.currencyIconText}>💎</Text>
-              </View>
-              <View style={styles.currencyInfo}>
-                <Text style={styles.currencyName}>ETHW</Text>
-              </View>
-              <View style={styles.dropdownIcon}>
-                <Icon name="chevron-down" size={20} color="#999" />
-              </View>
-            </View>
-            <View style={styles.currencyRight}>
-              <Text style={styles.amountRangeTo}>0.0072 - 5700</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <TouchableOpacity style={styles.addFundsButton}>
-        <Text style={styles.addFundsButtonText}>Add Funds</Text>
-      </TouchableOpacity>
+      {activeTab === 'instant' && renderInstantTab()}
+      {activeTab === 'recurring' && renderRecurringTab()}
+      {activeTab === 'limit' && renderLimitTab()}
     </SafeAreaView>
   );
 };
@@ -222,8 +411,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
-  placeholder: {
-    width: 32,
+  iconButton: {
+    padding: 4,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -293,31 +482,30 @@ const styles = StyleSheet.create({
     color: '#ff8c00',
     fontWeight: '600',
   },
-  infoButton: {
-    padding: 4,
-  },
   convertContainer: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
   },
+  content: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   currencySection: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   sectionLabel: {
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+    fontWeight: '500',
   },
-  availableContainer: {
-    alignItems: 'flex-end',
-    marginBottom: 8,
+  percentageLabel: {
+    color: '#00C853',
+    fontSize: 13,
   },
-  availableText: {
-    fontSize: 12,
-    color: '#999',
-  },
-  currencyCard: {
+  inputCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -325,80 +513,156 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
   },
-  currencyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  inputLeft: {
     flex: 1,
   },
-  currencyIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  currencySelector: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  currencySelectorStatic: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  currencyIconSmall: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   currencyIconText: {
-    fontSize: 20,
-  },
-  currencyInfo: {
-    justifyContent: 'center',
-    marginRight: 8,
+    fontSize: 18,
   },
   currencyName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
   },
-  currencySubtext: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 2,
-  },
-  dropdownIcon: {
-    padding: 4,
-  },
-  currencyRight: {
+  inputRight: {
     alignItems: 'flex-end',
   },
+  amountInput: {
+    fontSize: 28,
+    fontWeight: '300',
+    color: '#333',
+    textAlign: 'right',
+    padding: 0,
+    minWidth: 100,
+  },
+  amountInputLarge: {
+    fontSize: 28,
+    fontWeight: '300',
+    color: '#333',
+    textAlign: 'right',
+  },
   amountRange: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '300',
     color: '#ccc',
-    marginBottom: 4,
+    textAlign: 'right',
   },
-  amountRangeTo: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: '#ccc',
+  balanceText: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
   },
-  maxButton: {
-    fontSize: 14,
-    color: '#ff8c00',
-    fontWeight: '600',
-  },
-  swapIconContainer: {
+  conversionRate: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 8,
+    paddingVertical: 12,
+  },
+  conversionText: {
+    fontSize: 14,
+    color: '#666',
   },
   swapButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#f8f8f8',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addFundsButton: {
-    backgroundColor: '#FFD699',
+  settingsSection: {
+    marginTop: 24,
+    paddingBottom: 20,
+  },
+  settingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  settingLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  settingValue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  settingValueText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f0f0f0',
+    marginVertical: 24,
+  },
+  expiresSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    marginTop: 24,
+  },
+  expiresLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  expiresValue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  expiresValueText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  actionButton: {
+    backgroundColor: '#FF8C00',
     marginHorizontal: 16,
     marginBottom: 16,
     padding: 18,
-    borderRadius: 24,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  addFundsButtonText: {
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+  },
+  previewButton: {
+    backgroundColor: '#FFE5CC',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    marginTop: 24,
+    padding: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  previewButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',

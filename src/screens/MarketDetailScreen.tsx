@@ -45,6 +45,7 @@ export const MarketDetailScreen: React.FC<MarketDetailScreenProps> = ({
   const { symbol, name, icon, color, price, change24h } = route.params;
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false); // NEW: Menu state
 
   const periods = ['7D', '30D', '180D', '360D'];
 
@@ -84,7 +85,11 @@ export const MarketDetailScreen: React.FC<MarketDetailScreenProps> = ({
             <Icon name="arrow-left" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Market Detail</Text>
-          <TouchableOpacity style={styles.menuButton}>
+          {/* UPDATED: Menu button with navigation */}
+          <TouchableOpacity
+            style={styles.menuButton}
+            onPress={() => setShowMenu(true)}
+          >
             <Icon name="more-vertical" size={24} color="#333" />
           </TouchableOpacity>
         </View>
@@ -300,6 +305,43 @@ export const MarketDetailScreen: React.FC<MarketDetailScreenProps> = ({
                   <Text style={styles.alertTypeText}>{type}</Text>
                 </TouchableOpacity>
               ))}
+            </View>
+          </TouchableOpacity>
+        </Modal>
+
+        {/* NEW: 3-Dot Menu Modal */}
+        <Modal
+          visible={showMenu}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowMenu(false)}
+        >
+          <TouchableOpacity
+            style={styles.menuOverlay}
+            activeOpacity={1}
+            onPress={() => setShowMenu(false)}
+          >
+            <View style={styles.menuCard}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  setShowMenu(false);
+                  navigation.navigate('Alerts');
+                }}
+              >
+                <Icon name="bell" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Alerts</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem}>
+                <Icon name="share-2" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Share</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.menuItem}>
+                <Icon name="star" size={20} color="#333" />
+                <Text style={styles.menuItemText}>Add to Watchlist</Text>
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         </Modal>
@@ -549,6 +591,37 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   alertTypeText: {
+    fontSize: 15,
+    color: '#333',
+  },
+  // NEW: Menu Modal Styles
+  menuOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+    paddingTop: 60,
+    paddingRight: 16,
+  },
+  menuCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 8,
+    minWidth: 200,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    gap: 12,
+  },
+  menuItemText: {
     fontSize: 15,
     color: '#333',
   },

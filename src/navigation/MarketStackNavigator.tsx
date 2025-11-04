@@ -4,9 +4,10 @@ import { MarketScreen } from '../screens/MarketScreen';
 import { MarketDetailScreen } from '../screens/MarketDetailScreen';
 import { CreateAlertScreen } from '../screens/CreateAlertScreen';
 import { AlertsScreen } from '../screens/AlertsScreen';
-// import { EditAlertScreen } from '../screens/EditAlertScreen';
+import { EditAlertScreen } from '../screens/EditAlertScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
+// Define the param list for type safety
 export type MarketStackParamList = {
   MarketList: undefined;
   MarketDetail: {
@@ -60,7 +61,7 @@ export const MarketStackNavigator = ({ navigation, route }: any) => {
       <Stack.Screen name="MarketDetail" component={MarketDetailScreen} />
       <Stack.Screen name="CreateAlert" component={CreateAlertScreen} />
       <Stack.Screen name="Alerts" component={AlertsScreen} />
-      {/* <Stack.Screen name="EditAlert" component={EditAlertScreen} /> */}
+      <Stack.Screen name="EditAlert" component={EditAlertScreen} />
     </Stack.Navigator>
   );
 };
