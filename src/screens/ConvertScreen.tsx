@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,14 +8,24 @@ import {
   Dimensions,
   TextInput,
   ScrollView,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import Icon from 'react-native-vector-icons/Feather';
-
+import { getSwapQuote, SwapQuote } from '../services/zeroExService';
 interface ConvertScreenProps {
   onClose: () => void;
 }
 
+// Token address mapping
+const TOKEN_ADDRESSES: { [key: string]: string } = {
+  ETH: '0x7C03c1D1C5B4BA1Ac76551E27922E1dCAAD57fD8',
+  BNB: '0xCC42724C6683B7E57334c4E856f4c9965ED682bD',
+  // USDC: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+};
+// const { ready, authenticated, login } = usePrivy();
+// const { wallets } = useWallets();
 export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<'instant' | 'recurring' | 'limit'>(
     'instant',
@@ -23,6 +33,11 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
   const [selectedPeriod, setSelectedPeriod] = useState('7D');
   const [fromAmount, setFromAmount] = useState('0.00145667');
   const [toAmount, setToAmount] = useState('1');
+  const [fromToken, setFromToken] = useState('BNB');
+  const [toToken, setToToken] = useState('MIRA');
+  const [isLoadingQuote, setIsLoadingQuote] = useState(false);
+  const [currentQuote, setCurrentQuote] = useState<SwapQuote | null>(null);
+  const [isSwapping, setIsSwapping] = useState(false);
 
   const periods = ['7D', '30D', '180D', '360D'];
 
@@ -33,6 +48,87 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
         data: [0.0015, 0.0018, 0.0014, 0.0016, 0.0015, 0.00145],
       },
     ],
+  };
+
+  useEffect(() => {
+    if (fromAmount && parseFloat(fromAmount) > 0) {
+      fetchQuote();
+    }
+  }, [fromAmount, fromToken, toToken]);
+
+  const fetchQuote = async () => {
+    try {
+      setIsLoadingQuote(true);
+
+      const sellAmount = (parseFloat(fromAmount) * 1e18).toString();
+
+      const quote = await getSwapQuote({
+        chainId: 1,
+        sellToken: TOKEN_ADDRESSES[fromToken],
+        buyToken: TOKEN_ADDRESSES[toToken],
+        sellAmount: sellAmount,
+        taker: 'cmhio0Il200pzl20bpw9bhx9s',
+      });
+
+      setCurrentQuote(quote);
+
+      // Update the buy amount based on the quote
+      const buyAmountInTokens = (parseFloat(quote.buyAmount) / 1e18).toFixed(6);
+      setToAmount(buyAmountInTokens);
+    } catch (error) {
+      console.error('Error fetching quote:', error);
+      Alert.alert('Error', 'Failed to fetch swap quote. Please try again.');
+    } finally {
+      setIsLoadingQuote(false);
+    }
+  };
+
+  const handleSwapNow = async () => {
+    if (!currentQuote) {
+      Alert.alert('Error', 'Please wait for the quote to load');
+      return;
+    }
+    // const wallet = wallets[0];
+    Alert.alert(
+      'Confirm Swap',
+      `Swap ${fromAmount} ${fromToken} for ${toAmount} ${toToken}?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirm',
+          onPress: async () => {
+            try {
+              setIsSwapping(true);
+
+              console.log('Swap transaction data:', {
+                to: currentQuote.to,
+                data: currentQuote.data,
+                value: currentQuote.value,
+                gasPrice: currentQuote.gasPrice,
+                gas: currentQuote.gas,
+              });
+
+              // const tx = await (wallet as any).sendTransaction({
+              //   to: currentQuote.to,
+              //   data: currentQuote.data,
+              //   value: currentQuote.value,
+              // });
+              // await tx.wait();
+
+              Alert.alert('Success', 'Swap completed successfully!');
+            } catch (error) {
+              console.error('Swap error:', error);
+              Alert.alert('Error', 'Failed to execute swap. Please try again.');
+            } finally {
+              setIsSwapping(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const renderInstantTab = () => (
@@ -95,9 +191,9 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
             <View style={styles.inputLeft}>
               <TouchableOpacity style={styles.currencySelector}>
                 <View style={styles.currencyIconSmall}>
-                  <Text style={styles.currencyIconText}>🔶</Text>
+                  <Text style={styles.currencyIconText}>💎</Text>
                 </View>
-                <Text style={styles.currencyName}>BNB</Text>
+                <Text style={styles.currencyName}>{fromToken}</Text>
                 <Icon name="chevron-down" size={16} color="#999" />
               </TouchableOpacity>
             </View>
@@ -115,8 +211,25 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
         </View>
 
         <View style={styles.conversionRate}>
-          <Text style={styles.conversionText}>1 BTC = 6 MIRA</Text>
-          <TouchableOpacity style={styles.swapButton}>
+          <View>
+            <Text style={styles.conversionText}>
+              1 {fromToken} ={' '}
+              {currentQuote ? parseFloat(currentQuote.price).toFixed(6) : '...'}{' '}
+              {toToken}
+            </Text>
+            {isLoadingQuote && (
+              <Text style={styles.loadingText}>Fetching best price...</Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={styles.swapButton}
+            onPress={() => {
+              // Swap tokens
+              const temp = fromToken;
+              setFromToken(toToken);
+              setToToken(temp);
+            }}
+          >
             <Icon name="repeat" size={20} color="#666" />
           </TouchableOpacity>
         </View>
@@ -129,7 +242,7 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
                 <View style={styles.currencyIconSmall}>
                   <Text style={styles.currencyIconText}>💎</Text>
                 </View>
-                <Text style={styles.currencyName}>MIRA</Text>
+                <Text style={styles.currencyName}>{toToken}</Text>
                 <Icon name="chevron-down" size={16} color="#999" />
               </TouchableOpacity>
             </View>
@@ -140,6 +253,7 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
                 onChangeText={setToAmount}
                 keyboardType="decimal-pad"
                 placeholderTextColor="#ccc"
+                editable={false}
               />
               <Text style={styles.balanceText}>Balance = 20</Text>
             </View>
@@ -147,8 +261,19 @@ export const ConvertScreen: React.FC<ConvertScreenProps> = ({ onClose }) => {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.actionButton}>
-        <Text style={styles.actionButtonText}>Swap Now</Text>
+      <TouchableOpacity
+        style={[
+          styles.actionButton,
+          (isLoadingQuote || isSwapping) && styles.actionButtonDisabled,
+        ]}
+        onPress={handleSwapNow}
+        disabled={isLoadingQuote || isSwapping}
+      >
+        {isSwapping ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.actionButtonText}>Swap Now</Text>
+        )}
       </TouchableOpacity>
     </>
   );
@@ -580,6 +705,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
+  loadingText: {
+    fontSize: 12,
+    color: '#ff8c00',
+    marginTop: 4,
+  },
   swapButton: {
     width: 36,
     height: 36,
@@ -647,6 +777,10 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 12,
     alignItems: 'center',
+  },
+  actionButtonDisabled: {
+    backgroundColor: '#FFB84D',
+    opacity: 0.6,
   },
   actionButtonText: {
     fontSize: 16,
